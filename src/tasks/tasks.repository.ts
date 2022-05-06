@@ -1,13 +1,19 @@
-import { NotFoundException } from '@nestjs/common/exceptions';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { User } from '../auth/User.entity';
 import { DeleteResult, EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatus } from './task-status-enum';
 import { Task } from './task.entity';
+import { Logger } from '@nestjs/common';
 
 @EntityRepository(Task)
 export class TasksRepository extends Repository<Task> {
+  private logger = new Logger('TasksRepository');
+
   /**
    * get Tasks
    *
@@ -28,9 +34,17 @@ export class TasksRepository extends Repository<Task> {
           search: `%${search}%`,
         },
       );
+    try {
+      const tasks = await query.getMany();
+      return tasks;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get tasks for user "${user.username}". Filter: ${filterDto}`,
+        error.stack,
+      );
 
-    const tasks = await query.getMany();
-    return tasks;
+      throw new InternalServerErrorException();
+    }
   }
 
   /**
