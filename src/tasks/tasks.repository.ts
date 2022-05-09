@@ -2,7 +2,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common/exceptions';
-import { User } from '../auth/User.entity';
+import { User } from '../auth/user.entity';
 import { DeleteResult, EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
